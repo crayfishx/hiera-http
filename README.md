@@ -9,18 +9,18 @@ This is a back end plugin for Hiera that allows lookup to be sourced from HTTP q
 
 The following is an example hiera.yaml configuration for use with hiera-http
 
-  :backends:
-    - http
-
-  :http:
-    :host: 127.0.0.1
-    :port: 5984
-    :output: json
-    :failure: graceful
-    :paths:
-      - /configuration/%{fqdn}
-      - /configuration/%{env}
-      - /configuration/common
+    :backends:
+      - http
+     
+    :http:
+      :host: 127.0.0.1
+      :port: 5984
+      :output: json
+      :failure: graceful
+      :paths:
+        - /configuration/%{fqdn}
+        - /configuration/%{env}
+        - /configuration/common
 
 
 The following are optional configuration parameters
@@ -34,8 +34,8 @@ The following are optional configuration parameters
 `:failure: ` : When set to `graceful` will stop hiera-http from throwing an exception in the event of a connection error, timeout or invalid HTTP response and move on.  Without this option set hiera-http will throw an exception in such circumstances
 
 The `:paths:` parameter can also parse the lookup key, eg:
-  :paths:
-    /configuraiton.php?lookup=%{key}
+    :paths:
+      /configuraiton.php?lookup=%{key}
 
 ### TODO
 
