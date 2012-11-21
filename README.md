@@ -34,6 +34,7 @@ The following are optional configuration parameters
 `:failure: ` : When set to `graceful` will stop hiera-http from throwing an exception in the event of a connection error, timeout or invalid HTTP response and move on.  Without this option set hiera-http will throw an exception in such circumstances
 
 The `:paths:` parameter can also parse the lookup key, eg:
+
     :paths:
       /configuraiton.php?lookup=%{key}
 
