@@ -11,8 +11,8 @@ class Hiera
 
         answer = nil
 
-        paths.insert(0, order_override) if order_override
         paths = @config[:paths].map { |p| Backend.parse_string(p, scope, { 'key' => key }) }
+        paths.insert(0, order_override) if order_override
 
         http = Net::HTTP.new(@config[:host], @config[:port])
         http.read_timeout = @config[:http_read_timeout] || 10
