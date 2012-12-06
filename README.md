@@ -38,11 +38,18 @@ The `:paths:` parameter can also parse the lookup key, eg:
     :paths:
       /configuraiton.php?lookup=%{key}
 
+`:use_ssl:`: When set to true, enable SSL (default: false)
+
+`:ssl_ca_cert`: Specify a CA cert for use with SSL
+
+`:ssl_cert`: Specify location of SSL certificate
+
+`:ssl_key`: Specify location of SSL key
+
 ### TODO
 
 Theres a few things still on my list that I'm going to be adding, including
 
-* Add SSL support
 * Add HTTP basic auth support
 * Add proxy support
 * Add further handlers (eg: XML)
@@ -55,5 +62,17 @@ Theres a few things still on my list that I'm going to be adding, including
 * IRC (freenode) crayfishx
 * http://www.craigdunn.org
 
+### Credits
+
+* SSL components contributed from Ben Ford <ben.ford@puppetlabs.com>
+
+
+### Change Log
+
+#### 0.0.2
+* Added SSL support
+
+#### 0.0.1
+* Initial release
 
 
