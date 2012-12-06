@@ -4,11 +4,27 @@ class Hiera
 
       def initialize
         require 'net/http'
+        require 'net/https'
         @config = Config[:http]
 
         @http = Net::HTTP.new(@config[:host], @config[:port])
         @http.read_timeout = @config[:http_read_timeout] || 10
         @http.open_timeout = @config[:http_connect_timeout] || 10
+
+        if @config[:use_ssl]
+          @http.use_ssl = true
+          if @config[:ssl_cert]
+            @http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+            store = OpenSSL::X509::Store.new
+            store.add_cert(OpenSSL::X509::Certificate.new(File.read(@config[:ssl_ca_cert])))
+            @http.cert_store = store
+
+            @http.key = OpenSSL::PKey::RSA.new(File.read(@config[:ssl_cert]))
+            @http.cert = OpenSSL::X509::Certificate.new(File.read(@config[:ssl_key]))
+          end
+        else
+          @http.use_ssl = false
+        end
       end
 
       def lookup(key, scope, order_override, resolution_type)
@@ -34,6 +50,7 @@ class Hiera
 
           unless httpres.kind_of?(Net::HTTPSuccess)
             Hiera.debug("[hiera-http]: bad http response from #{@config[:host]}:#{@config[:port]}#{path}")
+            Hiera.debug("HTTP response code was #{httpres.code}")
             raise Exception, 'Bad HTTP response' unless @config[:failure] == 'graceful'
             next
           end
