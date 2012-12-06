@@ -5,6 +5,10 @@ class Hiera
       def initialize
         require 'net/http'
         @config = Config[:http]
+
+        @http = Net::HTTP.new(@config[:host], @config[:port])
+        @http.read_timeout = @config[:http_read_timeout] || 10
+        @http.open_timeout = @config[:http_connect_timeout] || 10
       end
 
       def lookup(key, scope, order_override, resolution_type)
@@ -14,10 +18,6 @@ class Hiera
         paths = @config[:paths].map { |p| Backend.parse_string(p, scope, { 'key' => key }) }
         paths.insert(0, order_override) if order_override
 
-        http = Net::HTTP.new(@config[:host], @config[:port])
-        http.read_timeout = @config[:http_read_timeout] || 10
-        http.open_timeout = @config[:http_connect_timeout] || 10
-
 
         paths.each do |path|
 
@@ -25,7 +25,7 @@ class Hiera
           httpreq = Net::HTTP::Get.new(path)
 
           begin
-            httpres = http.request(httpreq)
+            httpres = @http.request(httpreq)
           rescue Exception => e
             Hiera.warn("[hiera-http]: Net::HTTP threw exception #{e.message}")
             raise Exception, e.message unless @config[:failure] == 'graceful'
