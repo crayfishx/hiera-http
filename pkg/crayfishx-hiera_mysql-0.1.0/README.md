@@ -69,10 +69,6 @@ Theres a few things still on my list that I'm going to be adding, including
 
 ### Change Log
 
-#### 0.1.0
-* Stable
-* Puppet Forge release
-
 #### 0.0.2
 * Added SSL support
 

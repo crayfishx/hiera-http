@@ -1,0 +1,11 @@
+name    'crayfishx-hiera_mysql'
+version '0.1.0'
+source 'http://github.com/crayfishx/hiera-mysql'
+author 'Craig Dunn'
+license 'Apache License, Version 2.0'
+summary 'HTTP/REST API back end for Hiera'
+description 'Back end for Hiera that performs lookups using HTTP GET requests.'
+project_page 'http://github.com/crayfishx/hiera-http'
+
+## Add dependencies, if any:
+# dependency 'username/name', '>= 1.2.0'

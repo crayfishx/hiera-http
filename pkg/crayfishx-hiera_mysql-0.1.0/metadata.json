@@ -1,0 +1,22 @@
+{
+  "name": "crayfishx-hiera_mysql",
+  "version": "0.1.0",
+  "source": "http://github.com/crayfishx/hiera-mysql",
+  "author": "Craig Dunn",
+  "license": "Apache License, Version 2.0",
+  "summary": "HTTP/REST API back end for Hiera",
+  "description": "Back end for Hiera that performs lookups using HTTP GET requests.",
+  "project_page": "http://github.com/crayfishx/hiera-http",
+  "dependencies": [
+
+  ],
+  "types": [
+
+  ],
+  "checksums": {
+    "Modulefile": "e808ad4d1b39bc0f57e75dc75cd4c3de",
+    "README.md": "a79e11d7c1ccd2bd0282822aeb195928",
+    "Rakefile": "b53e73ab7b2e9c3949ba55177a58bb48",
+    "lib/hiera/backend/http_backend.rb": "101eb5cabd578a440cc36be5bbf8e949"
+  }
+}
