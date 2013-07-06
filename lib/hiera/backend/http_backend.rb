@@ -115,9 +115,13 @@ class Hiera
         JSON.parse(answer)[key]
       end
 
-      def yaml_handler(answer)
+      def yaml_handler(key, answer)
         require 'yaml'
-        YAML.parse(answer)[key]
+        if YAML.parse(answer)[key].nil?
+           return nil
+        else
+           YAML.parse(answer)[key].transform
+        end
       end
 
     end
