@@ -10,6 +10,7 @@ class Hiera
         @http = Net::HTTP.new(@config[:host], @config[:port])
         @http.read_timeout = @config[:http_read_timeout] || 10
         @http.open_timeout = @config[:http_connect_timeout] || 10
+        @path_base = @config[:path_base] || ''
 
         @cache = {}
         @path_base = @config[:path_base] || ''
