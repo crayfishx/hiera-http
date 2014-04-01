@@ -1,5 +1,5 @@
 require 'rubygems'
-require 'rake/gempackagetask'
+require 'rubygems/package_task'
 
 spec = Gem::Specification.new do |gem|
     gem.name = "hiera-http"
@@ -14,7 +14,7 @@ spec = Gem::Specification.new do |gem|
     gem.add_dependency('json', '>=1.1.1')
 end
 
-Rake::GemPackageTask.new(spec) do |pkg|
+Gem::PackageTask.new(spec) do |pkg|
     pkg.need_tar = true
+    pkg.gem_spec = spec
 end
-
