@@ -51,7 +51,9 @@ class Hiera
           unless httpres.kind_of?(Net::HTTPSuccess)
             Hiera.debug("[hiera-http]: bad http response from #{@config[:host]}:#{@config[:port]}#{path}")
             Hiera.debug("HTTP response code was #{httpres.code}")
-            raise Exception, 'Bad HTTP response' unless @config[:failure] == 'graceful'
+            unless ( httpres.code == '404' && @config[:ignore_404] == true )
+              raise Exception, 'Bad HTTP response' unless @config[:failure] == 'graceful'
+            end
             next
           end
 
