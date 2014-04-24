@@ -1,0 +1,22 @@
+{
+  "name": "crayfishx-hiera_http",
+  "version": "1.0.0",
+  "source": "http://github.com/crayfishx/hiera-http",
+  "author": "Craig Dunn",
+  "license": "Apache License, Version 2.0",
+  "summary": "HTTP/REST API back end for Hiera",
+  "description": "Back end plugin for Hiera that allows lookup to be sourced from HTTP queries.",
+  "project_page": "http://github.com/crayfishx/hiera-http",
+  "dependencies": [
+
+  ],
+  "types": [
+
+  ],
+  "checksums": {
+    "Modulefile": "5cf306983a57ea99f9c54a9564a82c39",
+    "README.md": "013ba51adbb24bccb770f6ade54f6072",
+    "Rakefile": "da6f9edc81d86a8f3955612016244aa0",
+    "lib/hiera/backend/http_backend.rb": "101eb5cabd578a440cc36be5bbf8e949"
+  }
+}
