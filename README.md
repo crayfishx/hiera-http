@@ -48,6 +48,12 @@ The `:paths:` parameter can also parse the lookup key, eg:
 
 `:ssl_key`: Specify location of SSL key
 
+`:use_auth:`: When set to true, enable basic auth (default: false)
+
+`:auth_user:`: The user for basic auth
+
+`:auth_pass:`: The password for basic auth
+
 ### TODO
 
 Theres a few things still on my list that I'm going to be adding, including
