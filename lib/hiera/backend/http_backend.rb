@@ -40,6 +40,10 @@ class Hiera
           Hiera.debug("[hiera-http]: Lookup #{key} from #{@config[:host]}:#{@config[:port]}#{path}")
           httpreq = Net::HTTP::Get.new(path)
 
+          if @config[:use_auth]
+              httpreq.basic_auth @config[:auth_user], @config[:auth_pass]
+          end
+
           begin
             httpres = @http.request(httpreq)
           rescue Exception => e
