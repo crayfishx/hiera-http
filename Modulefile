@@ -1,5 +1,5 @@
 name 'crayfishx-hiera_http'
-version '1.0.1'
+version '1.2.0'
 source 'http://github.com/crayfishx/hiera-http'
 author 'Craig Dunn'
 license 'Apache License, Version 2.0'
