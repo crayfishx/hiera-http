@@ -38,7 +38,7 @@ The following are optional configuration parameters
 The `:paths:` parameter can also parse the lookup key, eg:
 
     :paths:
-      /configuraiton.php?lookup=%{key}
+      /configuration.php?lookup=%{key}
 
 `:use_ssl:`: When set to true, enable SSL (default: false)
 
