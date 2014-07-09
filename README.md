@@ -48,6 +48,8 @@ The `:paths:` parameter can also parse the lookup key, eg:
 
 `:ssl_key`: Specify location of SSL key
 
+`:ssl_verify`: Specify whether to verify SSL certificates (default: true)
+
 ### TODO
 
 Theres a few things still on my list that I'm going to be adding, including

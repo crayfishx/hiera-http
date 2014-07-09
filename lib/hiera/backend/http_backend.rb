@@ -13,8 +13,14 @@ class Hiera
 
         if @config[:use_ssl]
           @http.use_ssl = true
-          if @config[:ssl_cert]
+
+          if @config[:ssl_verify] == false
+            @http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+          else
             @http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+          end
+
+          if @config[:ssl_cert]
             store = OpenSSL::X509::Store.new
             store.add_cert(OpenSSL::X509::Certificate.new(File.read(@config[:ssl_ca_cert])))
             @http.cert_store = store
