@@ -3,7 +3,7 @@ require 'rubygems/package_task'
 
 spec = Gem::Specification.new do |gem|
     gem.name = "hiera-http"
-    gem.version = "1.0.1"
+    gem.version = "1.2.0"
     gem.summary = "HTTP backend for Hiera"
     gem.email = "craig@craigdunn.org"
     gem.author = "Craig Dunn"

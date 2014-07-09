@@ -72,13 +72,23 @@ Theres a few things still on my list that I'm going to be adding, including
 * IRC (freenode) crayfishx
 * http://www.craigdunn.org
 
-### Credits
+### Contributors
 
 * SSL components contributed from Ben Ford <ben.ford@puppetlabs.com>
-
+* Louis Jencka <jencka>
 
 ### Change Log
 
+#### 1.2.0
+
+* Support for SSL verify options <jencka>
+* Support for HTTP auth <jencka>
+
+#### 1.0.1
+
+* 1.0 release
+* Support for ignoring 404's when failure is not set to graceful
+ 
 #### 0.1.0
 * Stable
 * Puppet Forge release
