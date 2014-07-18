@@ -1,0 +1,13 @@
+{
+  "name": "crayfishx-hiera_http",
+  "version": "1.2.0",
+  "author": "Craig Dunn",
+  "summary": "Back end plugin for Hiera that allows lookup to be sourced from HTTP queries.",
+  "license": "Apache 2.0",
+  "source": "http://github.com/crayfishx/hiera-http",
+  "project_page": "https://github.com/crayfishx/hiera-http",
+  "issues_url": "https://github.com/crayfishx/hiera-http/issues",
+  "dependencies": [
+  ]
+}
+
