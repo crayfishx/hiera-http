@@ -78,7 +78,7 @@ class Hiera
             answer << parsed_result
           when :hash
             answer ||= {}
-            answer = parsed_result.merge answer
+            answer = Backend.merge_answer(parsed_result, answer)
           else
             answer = parsed_result
             break
