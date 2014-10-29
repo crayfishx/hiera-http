@@ -68,7 +68,7 @@ class Hiera
           end
 
           result = self.parse_response(key, httpres.body)
-          next unless result
+          next if result.nil?
 
           parsed_result = Backend.parse_answer(result, scope)
 
