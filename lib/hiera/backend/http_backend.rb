@@ -15,6 +15,10 @@ class Hiera
         @cache_timeout = @config[:cache_timeout] || 10
         @cache_clean_interval = @config[:cache_clean_interval] || 3600
 
+        if @config[:key_whitelist]
+          @key_regexp = Regexp.union(@config[:key_whitelist])
+        end
+
         if @config[:use_ssl]
           @http.use_ssl = true
 
@@ -38,6 +42,8 @@ class Hiera
       end
 
       def lookup(key, scope, order_override, resolution_type)
+        return if @key_regexp && key[@key_regexp].to_s.bytesize != key.bytesize
+
         answer = nil
 
         paths = @config[:paths].map { |p| Backend.parse_string(p, scope, { 'key' => key }) }
