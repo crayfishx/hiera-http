@@ -10,7 +10,10 @@ class Hiera
         @http = Net::HTTP.new(@config[:host], @config[:port])
         @http.read_timeout = @config[:http_read_timeout] || 10
         @http.open_timeout = @config[:http_connect_timeout] || 10
+
+        @cache = {}
         @path_base = @config[:path_base] || ''
+        @cache_timeout = @config[:cache_timeout] || 10
 
         if @config[:use_ssl]
           @http.use_ssl = true
@@ -35,7 +38,6 @@ class Hiera
       end
 
       def lookup(key, scope, order_override, resolution_type)
-
         answer = nil
 
         paths = @config[:paths].clone
@@ -47,15 +49,10 @@ class Hiera
           Hiera.debug("[hiera-http]: Lookup #{key} from #{@config[:host]}:#{@config[:port]}#{path}")
           httpreq = Net::HTTP::Get.new(path)
 
-          if @config[:use_auth]
-              httpreq.basic_auth @config[:auth_user], @config[:auth_pass]
-          end
-
-          begin
-            httpres = @http.request(httpreq)
-          rescue Exception => e
-            Hiera.warn("[hiera-http]: Net::HTTP threw exception #{e.message}")
+          result = http_get_and_parse_with_cache(path)
+          result = result[key] if result.is_a?(Hash)
             raise Exception, e.message unless @config[:failure] == 'graceful'
+          next unless result
             next
           end
 
@@ -89,30 +86,19 @@ class Hiera
       end
 
 
-      def parse_response(key,answer)
+      private
 
-        return nil unless answer
+      def parse_response(answer)
+        return unless answer
 
-        Hiera.debug("[hiera-http]: Query returned data, parsing response as #{@config[:output] || 'plain'}")
+        format = @config[:output] || 'plain'
+        Hiera.debug("[hiera-http]: Query returned data, parsing response as #{format}")
 
-        case @config[:output]
-
-        when 'plain'
-          # When the output format is configured as plain we assume that if the
-          # endpoint URL returns an HTTP success then the contents of the response
-          # body is the value itself, or nil.
-          #
-          answer
+        case format
         when 'json'
-          # If JSON is specified as the output format, assume the output of the
-          # endpoint URL is a JSON document and return keypart that matched our
-          # lookup key
-          self.json_handler(key,answer)
+          parse_json answer
         when 'yaml'
-          # If YAML is specified as the output format, assume the output of the
-          # endpoint URL is a YAML document and return keypart that matched our
-          # lookup key
-          self.yaml_handler(key,answer)
+          parse_yaml answer
         else
           answer
         end
@@ -120,17 +106,58 @@ class Hiera
 
       # Handlers
       # Here we define specific handlers to parse the output of the http request
-      # and return a value.  Currently we support YAML and JSON
+      # and return its structured representation.  Currently we support YAML and JSON
       #
-      def json_handler(key,answer)
+      def parse_json(answer)
         require 'rubygems'
         require 'json'
-        JSON.parse(answer)[key]
+        JSON.parse(answer)
       end
 
-      def yaml_handler(answer)
+      def parse_yaml(answer)
         require 'yaml'
-        YAML.parse(answer)[key]
+        YAML.parse(answer)
+      end
+
+      def http_get_and_parse_with_cache(path)
+        return http_get(path) if @cache_timeout <= 0
+
+        now = Time.now.to_i
+        expired_at = now + @cache_timeout
+        unless @cache[path] && @cache[path][:created_at] < expired_at
+          @cache[path] = {
+            :created_at => now,
+            :result => http_get_and_parse(path)
+          }
+        end
+        @cache[path][:result]
+      end
+
+      def http_get_and_parse(path)
+        httpreq = Net::HTTP::Get.new(path)
+
+        if @config[:use_auth]
+          httpreq.basic_auth @config[:auth_user], @config[:auth_pass]
+        end
+
+        begin
+          httpres = @http.request(httpreq)
+        rescue Exception => e
+          Hiera.warn("[hiera-http]: Net::HTTP threw exception #{e.message}")
+          raise Exception, e.message unless @config[:failure] == 'graceful'
+          return
+        end
+
+        unless httpres.kind_of?(Net::HTTPSuccess)
+          Hiera.debug("[hiera-http]: bad http response from #{@config[:host]}:#{@config[:port]}#{path}")
+          Hiera.debug("HTTP response code was #{httpres.code}")
+          unless httpres.code == '404' && @config[:ignore_404]
+            raise Exception, 'Bad HTTP response' unless @config[:failure] == 'graceful'
+          end
+          return
+        end
+
+        parse_response httpres.body
       end
 
     end
