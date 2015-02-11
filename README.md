@@ -16,6 +16,7 @@ The following is an example hiera.yaml configuration for use with hiera-http
       :host: 127.0.0.1
       :port: 5984
       :output: json
+      :cache_timeout: 10
       :failure: graceful
       :paths:
         - /configuration/%{fqdn}
@@ -30,6 +31,8 @@ The following are optional configuration parameters
 `:http_connect_timeout: ` : Timeout in seconds for the HTTP connect (default 10)
 
 `:http_read_timeout: ` : Timeout in seconds for waiting for a HTTP response (default 10)
+
+`:cache_timeout: ` : Timeout in seconds for HTTP requests to a same path (default 10)
 
 `:failure: ` : When set to `graceful` will stop hiera-http from throwing an exception in the event of a connection error, timeout or invalid HTTP response and move on.  Without this option set hiera-http will throw an exception in such circumstances
 
