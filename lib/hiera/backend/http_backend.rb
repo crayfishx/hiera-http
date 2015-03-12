@@ -107,6 +107,11 @@ class Hiera
 
         now = Time.now.to_i
         expired_at = now + @cache_timeout
+
+        # Deleting all stale cache entries can be expensive. Do not do it every time
+        periodically_clean_cache(now, expired_at)
+
+        # Just refresh the entry being requested for performance
         unless @cache[path] && @cache[path][:created_at] < expired_at
           @cache[path] = {
             :created_at => now,
@@ -143,6 +148,16 @@ class Hiera
         parse_response httpres.body
       end
 
+      CLEAN_CACHE_INTERVAL = 3600
+
+      def periodically_clean_cache(now, expired_at)
+        return if now < @clean_cache_at.to_i
+
+        @clean_cache_at = now + CLEAN_CACHE_INTERVAL
+        @cache.select! do |_, entry|
+          entry[:created_at] < expired_at
+        end
+      end
     end
   end
 end
