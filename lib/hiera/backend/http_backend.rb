@@ -50,7 +50,7 @@ class Hiera
 
           result = http_get_and_parse_with_cache(path)
           result = result[key] if result.is_a?(Hash)
-          next unless result
+          next if result.nil?
 
           parsed_result = Backend.parse_answer(result, scope)
 
