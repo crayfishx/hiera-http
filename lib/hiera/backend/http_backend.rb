@@ -13,6 +13,7 @@ class Hiera
 
         @cache = {}
         @cache_timeout = @config[:cache_timeout] || 10
+        @cache_clean_interval = @config[:cache_clean_interval] || 3600
 
         if @config[:use_ssl]
           @http.use_ssl = true
@@ -109,7 +110,7 @@ class Hiera
         expired_at = now + @cache_timeout
 
         # Deleting all stale cache entries can be expensive. Do not do it every time
-        periodically_clean_cache(now, expired_at)
+        periodically_clean_cache(now, expired_at) unless @cache_clean_interval == 0
 
         # Just refresh the entry being requested for performance
         unless @cache[path] && @cache[path][:created_at] < expired_at
@@ -148,12 +149,11 @@ class Hiera
         parse_response httpres.body
       end
 
-      CLEAN_CACHE_INTERVAL = 3600
 
       def periodically_clean_cache(now, expired_at)
         return if now < @clean_cache_at.to_i
 
-        @clean_cache_at = now + CLEAN_CACHE_INTERVAL
+        @clean_cache_at = now + @cache_clean_interval
         @cache.select! do |_, entry|
           entry[:created_at] < expired_at
         end
