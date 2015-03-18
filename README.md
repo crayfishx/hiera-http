@@ -80,8 +80,14 @@ Theres a few things still on my list that I'm going to be adding, including
 
 * SSL components contributed from Ben Ford <ben.ford@puppetlabs.com>
 * Louis Jencka <jencka>
+* Jun Wu <quark-zju>
+
 
 ### Change Log
+
+#### 1.3.0
+
+* Added lookup caching features
 
 #### 1.2.0
 
