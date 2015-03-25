@@ -154,8 +154,8 @@ class Hiera
         return if now < @clean_cache_at.to_i
 
         @clean_cache_at = now + @cache_clean_interval
-        @cache.select! do |_, entry|
-          entry[:created_at] < expired_at
+        @cache.delete_if do |_, entry|
+          entry[:created_at] > expired_at
         end
       end
     end
