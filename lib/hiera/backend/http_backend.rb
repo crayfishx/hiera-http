@@ -11,6 +11,7 @@ class Hiera
         @http.read_timeout = @config[:http_read_timeout] || 10
         @http.open_timeout = @config[:http_connect_timeout] || 10
         @path_base = @config[:path_base] || ''
+        @path_suffix = @config[:path_suffix] || ''
 
         @cache = {}
         @path_base = @config[:path_base] || ''
@@ -44,7 +45,7 @@ class Hiera
 
         paths = @config[:paths].clone
         paths.insert(0, order_override) if order_override
-        paths.map! { |p| Backend.parse_string(@path_base + p, scope, { 'key' => key }) }
+        paths.map! { |p| Backend.parse_string(@path_base + p + @path_suffix, scope, { 'key' => key }) }
 
         paths.each do |path|
 
@@ -122,7 +123,7 @@ class Hiera
       end
 
       def http_get_and_parse_with_cache(path)
-        return http_get(path) if @cache_timeout <= 0
+        return http_get_and_parse(path) if @cache_timeout <= 0
 
         now = Time.now.to_i
         expired_at = now + @cache_timeout
@@ -179,4 +180,3 @@ class Hiera
     end
   end
 end
-
