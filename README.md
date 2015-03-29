@@ -45,6 +45,10 @@ The `:paths:` parameter can also parse the lookup key, eg:
     :paths:
       /configuration.php?lookup=%{key}
 
+`:path_base:`: This string will be prepended to every path.
+
+`:path_suffix:`: This string will be appended to every path.
+
 `:use_ssl:`: When set to true, enable SSL (default: false)
 
 `:ssl_ca_cert`: Specify a CA cert for use with SSL
