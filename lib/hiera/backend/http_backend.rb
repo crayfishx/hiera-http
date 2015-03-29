@@ -14,7 +14,6 @@ class Hiera
         @path_suffix = @config[:path_suffix] || ''
 
         @cache = {}
-        @path_base = @config[:path_base] || ''
         @cache_timeout = @config[:cache_timeout] || 10
         @cache_clean_interval = @config[:cache_clean_interval] || 3600
 
@@ -50,25 +49,9 @@ class Hiera
         paths.each do |path|
 
           Hiera.debug("[hiera-http]: Lookup #{key} from #{@config[:host]}:#{@config[:port]}#{path}")
-          httpreq = Net::HTTP::Get.new(path)
 
           result = http_get_and_parse_with_cache(path)
           result = result[key] if result.is_a?(Hash)
-            raise Exception, e.message unless @config[:failure] == 'graceful'
-          next unless result
-            next
-          end
-
-          unless httpres.kind_of?(Net::HTTPSuccess)
-            Hiera.debug("[hiera-http]: bad http response from #{@config[:host]}:#{@config[:port]}#{path}")
-            Hiera.debug("HTTP response code was #{httpres.code}")
-            unless ( httpres.code == '404' && @config[:ignore_404] == true )
-              raise Exception, 'Bad HTTP response' unless @config[:failure] == 'graceful'
-            end
-            next
-          end
-
-          result = self.parse_response(key, httpres.body)
           next if result.nil?
 
           parsed_result = Backend.parse_answer(result, scope)

@@ -54,6 +54,7 @@ The `:paths:` parameter can also parse the lookup key, eg:
 `:ssl_key`: Specify location of SSL key
 
 `:ssl_verify`: Specify whether to verify SSL certificates (default: true)
+
 `:use_auth:`: When set to true, enable basic auth (default: false)
 
 `:auth_user:`: The user for basic auth
