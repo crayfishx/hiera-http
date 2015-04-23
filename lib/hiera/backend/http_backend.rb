@@ -114,12 +114,22 @@ class Hiera
 
         # Just refresh the entry being requested for performance
         unless @cache[path] && @cache[path][:created_at] < expired_at
-          @cache[path] = {
-            :created_at => now,
-            :result => http_get_and_parse(path)
-          }
+          lookupvalue = http_get_and_parse(path)
+          Hiera.warn("[hiera-http]: Net::HTTP looked up value:#{lookupvalue}, #{lookupvalue.class}")
+          unless lookupvalue.nil?
+            Hiera.warn("[hiera-http]: Setting value in cache for #{path} to #{lookupvalue}")
+            @cache[path] = {
+              :created_at => now,
+              :result => lookupvalue
+            }
+          end
+          Hiera.warn("Value was nil, not storing in cache")
+          return lookupvalue
         end
-        @cache[path][:result]
+        value_from_cache = @cache[path][:result]
+
+        Hiera.warn("Returning value for #{path} from cache #{value_from_cache}")
+        return value_from_cache
       end
 
       def http_get_and_parse(path)
