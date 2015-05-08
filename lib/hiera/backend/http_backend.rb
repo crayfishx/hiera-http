@@ -104,18 +104,18 @@ class Hiera
       end
 
       def http_get_and_parse_with_cache(path)
-        return http_get(path) if @cache_timeout <= 0
+        return http_get_and_parse(path) if @cache_timeout <= 0
 
         now = Time.now.to_i
         expired_at = now + @cache_timeout
 
         # Deleting all stale cache entries can be expensive. Do not do it every time
-        periodically_clean_cache(now, expired_at) unless @cache_clean_interval == 0
+        periodically_clean_cache(now) unless @cache_clean_interval == 0
 
         # Just refresh the entry being requested for performance
-        unless @cache[path] && @cache[path][:created_at] < expired_at
+        if !@cache[path] || @cache[path][:expired_at] < now
           @cache[path] = {
-            :created_at => now,
+            :expired_at => expired_at,
             :result => http_get_and_parse(path)
           }
         end
@@ -150,12 +150,12 @@ class Hiera
       end
 
 
-      def periodically_clean_cache(now, expired_at)
+      def periodically_clean_cache(now)
         return if now < @clean_cache_at.to_i
 
         @clean_cache_at = now + @cache_clean_interval
         @cache.delete_if do |_, entry|
-          entry[:created_at] > expired_at
+          entry[:expired_at] < now
         end
       end
     end
