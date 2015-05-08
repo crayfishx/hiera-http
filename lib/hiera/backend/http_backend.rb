@@ -11,6 +11,8 @@ class Hiera
         @http.read_timeout = @config[:http_read_timeout] || 10
         @http.open_timeout = @config[:http_connect_timeout] || 10
 
+        @audit_log_dir = @config[:audit_log_dir]
+
         @cache = {}
         @cache_timeout = @config[:cache_timeout] || 10
         @cache_clean_interval = @config[:cache_clean_interval] || 3600
@@ -146,9 +148,33 @@ class Hiera
           return
         end
 
-        parse_response httpres.body
+        body = httpres.body
+        begin
+          write_audit_log path, body if @audit_log_dir
+        rescue Exception => e
+          Hiera.warn("[hiera-http]: Failed to write audit log #{e.message}")
+        end
+        parse_response body
       end
 
+      def write_audit_log(http_path, body)
+        require 'digest'
+        require 'fileutils'
+        require 'zlib'
+
+        sha1 = Digest::SHA1.hexdigest(body)
+        blob_path = File.join(@audit_log_dir, 'blobs', sha1[0..1], sha1[2..-1])
+
+        if !File.exist?(blob_path)
+          FileUtils.mkdir_p File.dirname(blob_path)
+          File.open(blob_path, 'wb') do |f|
+            Zlib::GzipWriter::wrap(f) { |gz| gz.write(body); gz.close }
+          end
+        end
+        File.open(File.join(@audit_log_dir, 'requests.log'), 'a') do |f|
+          f.puts "[#{Time.now}] #{http_path} #{sha1}"
+        end
+      end
 
       def periodically_clean_cache(now)
         return if now < @clean_cache_at.to_i
