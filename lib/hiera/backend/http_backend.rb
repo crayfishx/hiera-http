@@ -14,6 +14,7 @@ class Hiera
         @cache = {}
         @cache_timeout = @config[:cache_timeout] || 10
         @cache_clean_interval = @config[:cache_clean_interval] || 3600
+        @cache_disabled = @config[:disable_cache] || false
 
         if @config[:use_ssl]
           @http.use_ssl = true
@@ -48,7 +49,11 @@ class Hiera
 
           Hiera.debug("[hiera-http]: Lookup #{key} from #{@config[:host]}:#{@config[:port]}#{path}")
 
-          result = http_get_and_parse_with_cache(path)
+          result = if @cache_disabled
+                     http_get_and_parse(path)
+                   else
+                     http_get_and_parse_with_cache(path)
+                   end
           result = result[key] if result.is_a?(Hash)
           next if result.nil?
 
@@ -161,4 +166,3 @@ class Hiera
     end
   end
 end
-
