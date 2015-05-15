@@ -32,6 +32,11 @@ The following are optional configuration parameters
 
 `:http_read_timeout: ` : Timeout in seconds for waiting for a HTTP response (default 10)
 
+`:audit_log_dir:` : If set, write HTTP responses to a directory for audit purpose. The directory will look like:
+
+    ./blobs/fe/625f56522d2820aaed87232d405b7b561e44d4  # gzipped content (HTTP response body), the SHA1 of the uncompressed content is fe625f56522d2820aaed87232d405b7b561e44d4
+    ./requests.log  # request logs, one per line, for example "[2015-05-08 20:15:55 -0700] http://1.2.3.4/foo fe625f56522d2820aaed87232d405b7b561e44d4"
+
 `:cache_timeout: ` : Timeout in seconds for HTTP requests to a same path (default 10)
 
 `:cache_clean_interval: ` : Interval (in secs) to clean the cache (default 3600), set to 0 to disable cache cleaning 
