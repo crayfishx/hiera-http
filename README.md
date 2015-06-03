@@ -17,10 +17,6 @@ The following is an example hiera.yaml configuration for use with hiera-http
       :port: 5984
       :output: json
       :cache_timeout: 10
-      :key_whitelist:
-        - key1
-        - key2
-        - !ruby/regexp /app::.*/
       :failure: graceful
       :paths:
         - /configuration/%{fqdn}
@@ -40,7 +36,11 @@ The following are optional configuration parameters
 
 `:cache_clean_interval: ` : Interval (in secs) to clean the cache (default 3600), set to 0 to disable cache cleaning 
 
-`:key_whitelist: ` : If it is not nil, ignore keys not in the array (default nil).  The array can have strings and regexps.
+`:confine_to_keys: ` : Only use this backend if the key matches one of the regexes in the array
+
+      :confine_to_keys:
+        - "application.*"
+        - "apache::.*"
 
 `:failure: ` : When set to `graceful` will stop hiera-http from throwing an exception in the event of a connection error, timeout or invalid HTTP response and move on.  Without this option set hiera-http will throw an exception in such circumstances
 

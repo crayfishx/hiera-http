@@ -15,10 +15,6 @@ class Hiera
         @cache_timeout = @config[:cache_timeout] || 10
         @cache_clean_interval = @config[:cache_clean_interval] || 3600
 
-        if @config[:key_whitelist]
-          @key_regexp = Regexp.union(@config[:key_whitelist])
-        end
-
         if @config[:use_ssl]
           @http.use_ssl = true
 
@@ -42,7 +38,14 @@ class Hiera
       end
 
       def lookup(key, scope, order_override, resolution_type)
-        return if @key_regexp && key[@key_regexp].to_s.bytesize != key.bytesize
+
+        # if confine_to_keys is configured, then only proceed if one of the
+        # regexes matches the lookup key
+        #
+        if @config[:confine_to_keys].is_a?(Array)
+          match = @config[:confine_to_keys].select { |r| key[Regexp.new(r)] }[0]
+          return nil unless match
+        end
 
         answer = nil
 
