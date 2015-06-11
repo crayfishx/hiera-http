@@ -100,7 +100,7 @@ class Hiera
 
       def parse_yaml(answer)
         require 'yaml'
-        YAML.parse(answer)
+        YAML.load(answer)
       end
 
       def http_get_and_parse_with_cache(path)
