@@ -11,7 +11,7 @@ The following is an example hiera.yaml configuration for use with hiera-http
 
     :backends:
       - http
-     
+
     :http:
       :host: 127.0.0.1
       :port: 5984
@@ -32,9 +32,9 @@ The following are optional configuration parameters
 
 `:http_read_timeout: ` : Timeout in seconds for waiting for a HTTP response (default 10)
 
-`:cache_timeout: ` : Timeout in seconds for HTTP requests to a same path (default 10)
+`:cache_timeout: ` : Timeout in seconds for HTTP requests to a same path (default 10), set to 0 to disable the cache
 
-`:cache_clean_interval: ` : Interval (in secs) to clean the cache (default 3600), set to 0 to disable cache cleaning 
+`:cache_clean_interval: ` : Interval (in secs) to clean the cache (default 3600), set to 0 to disable cache cleaning
 
 `:failure: ` : When set to `graceful` will stop hiera-http from throwing an exception in the event of a connection error, timeout or invalid HTTP response and move on.  Without this option set hiera-http will throw an exception in such circumstances
 
@@ -103,7 +103,7 @@ Theres a few things still on my list that I'm going to be adding, including
 
 * 1.0 release
 * Support for ignoring 404's when failure is not set to graceful
- 
+
 #### 0.1.0
 * Stable
 * Puppet Forge release
@@ -113,5 +113,3 @@ Theres a few things still on my list that I'm going to be adding, including
 
 #### 0.0.1
 * Initial release
-
-
