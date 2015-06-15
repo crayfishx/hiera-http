@@ -92,6 +92,13 @@ Theres a few things still on my list that I'm going to be adding, including
 
 ### Change Log
 
+#### 1.4.0
+
+* Confine keys feature to restrct when the backend is used
+* Bug fixes
+* Documentation updates
+
+
 #### 1.3.1
 
 * Bugfix release for ruby 1.8.7 support
