@@ -146,6 +146,12 @@ class Hiera
           httpreq.basic_auth @config[:auth_user], @config[:auth_pass]
         end
 
+        if @config[:headers]
+          @config[:headers].each do |name,content|
+            httpreq.add_field name.to_s, content
+          end
+        end
+
         begin
           httpres = @http.request(httpreq)
         rescue Exception => e
