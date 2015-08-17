@@ -53,6 +53,14 @@ The `:paths:` parameter can also parse the lookup key, eg:
     :paths:
       /configuration.php?lookup=%{key}
 
+`:paths_array:` Support array as value for path parsing, eg:
+
+    :paths_array:
+        mykey: /somepath/%{mykey}
+
+If `mykey` is an array like ["one", "two"], it will create /somepath/one and /somepath/two paths.
+If for a reason `mykey` is not an array like "three", it will create  /somepath/three path.
+
 `:use_ssl:`: When set to true, enable SSL (default: false)
 
 `:ssl_ca_cert`: Specify a CA cert for use with SSL
