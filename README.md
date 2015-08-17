@@ -18,6 +18,8 @@ The following is an example hiera.yaml configuration for use with hiera-http
       :output: json
       :cache_timeout: 10
       :failure: graceful
+      :headers:
+        :X-Token: my-token
       :paths:
         - /configuration/%{fqdn}
         - /configuration/%{env}
@@ -66,6 +68,8 @@ The `:paths:` parameter can also parse the lookup key, eg:
 `:auth_user:`: The user for basic auth
 
 `:auth_pass:`: The password for basic auth
+
+`:headers:`: Hash of headers to send in the request
 
 ### TODO
 
