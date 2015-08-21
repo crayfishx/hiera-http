@@ -45,33 +45,6 @@ class Hiera
         end
       end
 
-      def build_paths(key, scope, order_override)
-        paths = @config[:paths].map { |p| Backend.parse_string(p, scope, { 'key' => key }) }
-        # Hiera don't support array as value for parse_string so we add it in config file.
-        # Notes at https://docs.puppetlabs.com/hiera/1/variables.html#interpolation-tokens
-        # We can't get the entire scope so we check if the value exist in the scope
-        # and we try to resolve :paths with this value
-        if !@config[:paths_array].nil?
-          @config[:paths_array].map do |var, p|
-            # if not in scope ignore it
-            if !scope[var].nil?
-              if scope[var].kind_of?(Array)
-                scope[var].each do |v|
-                  paths.push(Backend.parse_string(p, { var => v}, { 'key' => key }))
-                end
-              else
-                # allow non array values too
-                paths.push(Backend.parse_string(p, { var => scope[var]}, { 'key' => key }))
-              end
-            else
-              Hiera.warn("[hiera-http]: Variable #{var} not in scope for path #{p}")
-            end
-          end
-        end
-        paths.insert(0, order_override) if order_override
-        paths
-      end
-
       def lookup(key, scope, order_override, resolution_type)
 
         # if confine_to_keys is configured, then only proceed if one of the
@@ -81,9 +54,12 @@ class Hiera
           return nil unless key[@regex_key_match] == key
         end
 
+
         answer = nil
 
-        paths = build_paths(key, scope, order_override)
+        paths = @config[:paths].map { |p| Backend.parse_string(p, scope, { 'key' => key }) }
+        paths.insert(0, order_override) if order_override
+
 
         paths.each do |path|
 
@@ -208,5 +184,4 @@ class Hiera
     end
   end
 end
-
 
