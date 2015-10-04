@@ -32,11 +32,11 @@ class Hiera
             @http.verify_mode = OpenSSL::SSL::VERIFY_PEER
           end
 
-          if @config[:ssl_cert]
-            store = OpenSSL::X509::Store.new
-            store.add_cert(OpenSSL::X509::Certificate.new(File.read(@config[:ssl_ca_cert])))
-            @http.cert_store = store
+          if @config[:ssl_ca_cert]
+            @http.ca_file = @config[:ssl_ca_cert]
+          end
 
+          if @config[:ssl_cert]
             @http.key = OpenSSL::PKey::RSA.new(File.read(@config[:ssl_cert]))
             @http.cert = OpenSSL::X509::Certificate.new(File.read(@config[:ssl_key]))
           end
