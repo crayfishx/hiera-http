@@ -1,5 +1,7 @@
 ## hiera_http : a HTTP back end for Hiera
 
+[![Join the chat at https://gitter.im/crayfishx/hiera-http](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/crayfishx/hiera-http?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 
 ### Description
 
