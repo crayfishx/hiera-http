@@ -15,7 +15,6 @@ class Hiera
           :headers,
           :http_connect_timeout,
           :http_read_timeout,
-          :paths,
           :use_ssl,
           :ssl_ca_cert,
           :ssl_cert,
