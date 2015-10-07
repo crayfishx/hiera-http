@@ -98,6 +98,10 @@ Theres a few things still on my list that I'm going to be adding, including
 
 ### Change Log
 
+#### 2.0.0
+
+* All HTTP components ported to [lookup_http](http://github.com/crayfishx/lookup_http)
+
 #### 1.4.0
 
 * Confine keys feature to restrct when the backend is used
