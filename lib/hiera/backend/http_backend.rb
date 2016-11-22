@@ -5,7 +5,7 @@ class Hiera
       def initialize
         require 'lookup_http'
         @config = Config[:http]
-      
+
         lookup_supported_params = [
           :host,
           :port,
@@ -25,9 +25,9 @@ class Hiera
           :auth_pass,
         ]
         lookup_params = @config.select { |p| lookup_supported_params.include?(p) }
-        
+
         @lookup = LookupHttp.new(lookup_params.merge( { :debug_log => "Hiera.debug" } ))
-          
+
 
         @cache = {}
         @cache_timeout = @config[:cache_timeout] || 10
@@ -36,6 +36,8 @@ class Hiera
       end
 
       def lookup(key, scope, order_override, resolution_type)
+
+        require 'uri'
 
         # if confine_to_keys is configured, then only proceed if one of the
         # regexes matches the lookup key
@@ -55,7 +57,7 @@ class Hiera
 
           Hiera.debug("[hiera-http]: Lookup #{key} from #{@config[:host]}:#{@config[:port]}#{path}")
 
-          result = http_get_and_parse_with_cache(path)
+          result = http_get_and_parse_with_cache(URI.escape(path))
           result = result[key] if result.is_a?(Hash)
           next if result.nil?
 
