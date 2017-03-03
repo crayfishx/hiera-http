@@ -33,6 +33,13 @@ class Hiera
         @cache_timeout = @config[:cache_timeout] || 10
         @cache_clean_interval = @config[:cache_clean_interval] || 3600
 
+        @regex_key_match = nil
+
+        if confine_keys = @config[:confine_to_keys]
+          confine_keys.map! { |r| Regexp.new(r) }
+          @regex_key_match = Regexp.union(confine_keys)
+        end
+
       end
 
       def lookup(key, scope, order_override, resolution_type)
