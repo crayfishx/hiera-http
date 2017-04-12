@@ -57,7 +57,7 @@ class Hiera
         answer = nil
 
         paths = @config[:paths].map { |p| Backend.parse_string(p, scope, { 'key' => key }) }
-        paths.insert(0, order_override) if order_override
+        paths.insert(0, order_override).flatten! if order_override
 
 
         paths.each do |path|
