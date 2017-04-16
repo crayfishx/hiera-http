@@ -1,34 +1,65 @@
-## hiera_http : a HTTP back end for Hiera
-
-[![Join the chat at https://gitter.im/crayfishx/hiera-http](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/crayfishx/hiera-http?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
+## hiera_http : a HTTP data provider function (backend) for Hiera 5
 
 ### Description
 
-This is a back end plugin for Hiera that allows lookup to be sourced from HTTP queries.  The intent is to make this backend adaptable to allow you to query any data stored in systems with a RESTful API such as CouchDB or even a custom store with a web front-end
+This is a back end function for Hiera 5 that allows lookup to be sourced from HTTP queries.  The intent is to make this backend adaptable to allow you to query any data stored in systems with a RESTful API such as CouchDB or even a custom store with a web front-end
+
+### Compatibility
+
+* The 3.x series of hiera-http is only compatible with Hiera 5, that ships with Puppet 4.9+
+* Users looking for older implementations for Hiera 1,2 and 3 should use hiera-http 2.x
+* hiera-http 3 ships within the [crayfishx/hiera_http](https://forge.puppet.com/crayfishx/hiera_http)
+* hiera-http 2 (legacy) ships as a Rubygem "hiera-http"
+
+### Requirements
+
+The `lookup_http` gem must be installed and loadable from Puppet
+
+```
+# /opt/puppetlabs/puppet/bin/gem install lookup_http
+# puppetserver gem install lookup_http
+```
+
+
+### Installation
+
+The data provider is available by installing the `crayfishx/hiera_http` module into your environment.
+
+```
+# puppet module install crayfishx/hiera_http
+```
 
 ### Configuration
 
-The following is an example hiera.yaml configuration for use with hiera-http
+See [The official Puppet documentation](https://docs.puppet.com/puppet/4.9/hiera_intro.html) for more details on configuring Hiera 5.
 
-    :backends:
-      - http
+The following is an example Hiera 5 hiera.yaml configuration for use with hiera-http
 
-    :http:
-      :host: 127.0.0.1
-      :port: 5984
-      :output: json
-      :cache_timeout: 10
-      :failure: graceful
-      :headers:
-        :X-Token: my-token
-      :paths:
-        - /configuration/%{fqdn}
-        - /configuration/%{env}
-        - /configuration/common
+```yaml
+---
+
+version: 5
+
+hierarchy:
+  - name: "Hiera-HTTP lookup"
+    lookup_key: hiera_http
+    uris:
+      - http://localhost:5984/host/%{trusted.certname}
+      - http://localhost:5984/dc/%{facts.location}
+      - http://localhost:5984/role/%{facts.role}
+    options:
+      output: json
+      ignore_404: true
+```
+
+The following mandatory Hiera 5 options must be set for each level of the hierarchy.
+
+`name`: A human readable name for the lookup
+`lookup_key`: This option must be set to `hiera_http`
+`uris` or `uri`: An array of URI's passed to `uris` _or_ a single URI passed to `uri`
 
 
-The following are optional configuration parameters
+The following are optional configuration parameters supported in the `options` hash of the Hiera 5 config
 
 `:output: ` : Specify what handler to use for the output of the request.  Currently supported outputs are plain, which will just return the whole document, or YAML and JSON which parse the data and try to look up the key
 
@@ -36,24 +67,15 @@ The following are optional configuration parameters
 
 `:http_read_timeout: ` : Timeout in seconds for waiting for a HTTP response (default 10)
 
-`:cache_timeout: ` : Timeout in seconds for HTTP requests to a same path (default 10), set to 0 to disable the cache
-
-`:cache_clean_interval: ` : Interval (in secs) to clean the cache (default 3600), set to 0 to disable cache cleaning
-
 `:confine_to_keys: ` : Only use this backend if the key matches one of the regexes in the array
 
-      :confine_to_keys:
+      confine_to_keys:
         - "application.*"
         - "apache::.*"
 
 `:failure: ` : When set to `graceful` will stop hiera-http from throwing an exception in the event of a connection error, timeout or invalid HTTP response and move on.  Without this option set hiera-http will throw an exception in such circumstances
 
 `:ignore_404: ` : If `failure` is _not_ set to `graceful` then any error code received from the HTTP response will throw an exception.  This option makes 404 responses exempt from exceptions.  This is useful if you expect to get 404's for data items not in a certain part of the hierarchy and need to fall back to the next level in the hierarchy, but you still want to bomb out on other errors.
-
-The `:paths:` parameter can also parse the lookup key, eg:
-
-    :paths:
-      /configuration.php?lookup=%{key}
 
 `:use_ssl:`: When set to true, enable SSL (default: false)
 
@@ -73,15 +95,6 @@ The `:paths:` parameter can also parse the lookup key, eg:
 
 `:headers:`: Hash of headers to send in the request
 
-### TODO
-
-Theres a few things still on my list that I'm going to be adding, including
-
-* Add HTTP basic auth support
-* Add proxy support
-* Add further handlers (eg: XML)
-
-
 ### Author
 
 * Craig Dunn <craig@craigdunn.org>
@@ -89,50 +102,3 @@ Theres a few things still on my list that I'm going to be adding, including
 * IRC (freenode) crayfishx
 * http://www.craigdunn.org
 
-### Contributors
-
-* SSL components contributed from Ben Ford <ben.ford@puppetlabs.com>
-* Louis Jencka <jencka>
-* Jun Wu <quark-zju>
-
-
-### Change Log
-
-#### 2.0.0
-
-* All HTTP components ported to [lookup_http](http://github.com/crayfishx/lookup_http)
-
-#### 1.4.0
-
-* Confine keys feature to restrct when the backend is used
-* Bug fixes
-* Documentation updates
-
-
-#### 1.3.1
-
-* Bugfix release for ruby 1.8.7 support
-
-#### 1.3.0
-
-* Added lookup caching features
-
-#### 1.2.0
-
-* Support for SSL verify options <jencka>
-* Support for HTTP auth <jencka>
-
-#### 1.0.1
-
-* 1.0 release
-* Support for ignoring 404's when failure is not set to graceful
-
-#### 0.1.0
-* Stable
-* Puppet Forge release
-
-#### 0.0.2
-* Added SSL support
-
-#### 0.0.1
-* Initial release
