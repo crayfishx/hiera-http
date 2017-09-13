@@ -26,6 +26,7 @@ Puppet::Functions.create_function(:hiera_http) do
       end
     end
 
+    options['uri'].gsub! '__KEY__', key
     result = http_get(context, options)
 
     answer = result.is_a?(Hash) ? result[key] : result
