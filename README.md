@@ -116,8 +116,8 @@ hierarchy:
   - name: 'Jenkins data source'
     lookup_key: hiera_http
     uris:
-      - "http://jenkins.example.com:8080/hiera/lookup?scope=%{::trusted.certname}&key=__KEY__"
-      - "http://jenkins.example.com:8080/hiera/lookup?scope=%{::environment}&key=__KEY__"
+      - "http://jenkins.example.com:8080/hiera/lookup?scope=%{trusted.certname}&key=__KEY__"
+      - "http://jenkins.example.com:8080/hiera/lookup?scope=%{environment}&key=__KEY__"
     options:
       output: json
       failure: graceful
