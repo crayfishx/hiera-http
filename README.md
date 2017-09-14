@@ -95,6 +95,38 @@ The following are optional configuration parameters supported in the `options` h
 
 `:headers:`: Hash of headers to send in the request
 
+### Using the key name as part of the URI
+
+Previous versions of this backed allowed the use of `%{key}` to include the key
+name as part of the URL. Due to API changes in Hiera v5, this interpolation is
+no longer possible. This backend now supports an alternative method to include
+the key name using the `__KEY__` tag.
+
+Example using this backend to interact with the [Puppet Enterprise Jenkins Pipeline plugin](https://wiki.jenkins.io/display/JENKINS/Puppet+Enterprise+Pipeline+Plugin)
+
+```yaml
+---
+version: 5
+
+defaults:
+  datadir: hieradata
+  data_hash: yaml_data
+
+hierarchy:
+  - name: 'Jenkins data source'
+    lookup_key: hiera_http
+    uris:
+      - "http://jenkins.example.com:8080/hiera/lookup?scope=%{::trusted.certname}&key=__KEY__"
+      - "http://jenkins.example.com:8080/hiera/lookup?scope=%{::environment}&key=__KEY__"
+    options:
+      output: json
+      failure: graceful
+#      use_auth: true
+#     auth_user: ''
+#     auth_pass: ''
+
+```
+
 ### Author
 
 * Craig Dunn <craig@craigdunn.org>
