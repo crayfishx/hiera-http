@@ -23,6 +23,7 @@ Puppet::Functions.create_function(:hiera_http) do
       unless key[regex_key_match] == key
         context.explain { "Skipping hiera_http backend because key does not match confine_to_keys" }
         context.not_found
+        return
       end
     end
 
