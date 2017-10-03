@@ -2,6 +2,5 @@ language: ruby
 script: "bundle exec rspec --format documentation"
 
 rvm:
-  - jruby
   - 2.1.9
   - 2.4.1
