@@ -79,10 +79,17 @@ describe FakeFunction do
       end
     end
 
+    context "cached values" do
+      let(:options) { {
+        'uri' => 'http://localhost/path'
+      } }
 
-      
-      
+      it "should used cached value when available" do
+        expect(@context).to receive(:cache_has_key).with('/path').and_return(true)
+        expect(@context).to receive(:cached_value).with('/path').and_return({ 'tango' => 'bar'})
+        expect(@lookuphttp).not_to receive(:get_parsed)
+        expect(function.lookup_key('tango', options, @context)).to eq('bar')
+      end
+    end
   end
-
-
 end
