@@ -1,6 +1,5 @@
 
 
-
 class FakeFunction
   def self.dispatch(name, &block)
   end
