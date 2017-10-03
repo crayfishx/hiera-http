@@ -1,3 +1,6 @@
+
+[![Build Status](https://travis-ci.org/crayfishx/hiera-http.svg?branch=master)](https://travis-ci.org/crayfishx/hiera-http)
+
 ## hiera_http : a HTTP data provider function (backend) for Hiera 5
 
 ### Description
