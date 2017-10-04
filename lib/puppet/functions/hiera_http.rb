@@ -27,13 +27,32 @@ Puppet::Functions.create_function(:hiera_http) do
       end
     end
 
-    options['uri'].gsub! '__KEY__', key
+    options['uri'] = parse_tags(key, options['uri'])
     result = http_get(context, options)
 
     answer = result.is_a?(Hash) ? result[key] : result
     context.not_found if answer.nil?
     return answer
   end
+
+  def parse_tags(key,uri)
+    key_parts = key.split(/::/)
+    parsed_uri = uri.gsub(/__(\w+)__/i) { |tag|
+        case tag
+        when '__KEY__'
+          key
+        when '__MODULE__'
+          key_parts.first if key_parts.length > 1
+        when '__CLASS__'
+          key_parts[0..-2].join('::') if key_parts.length > 1
+        when '__PARAMETER__'
+          key_parts.last
+        end
+    }
+    return parsed_uri
+  end
+
+
 
   def http_get(context, options)
     uri = URI.parse(options['uri'])
