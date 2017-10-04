@@ -40,6 +40,36 @@ describe FakeFunction do
         expect(@lookuphttp).to receive(:get_parsed).with('/path/foo::bar::tango')
         function.lookup_key('foo::bar::tango', options, @context)
       end
+
+      it "should interpolate __MODULE__ correctly" do
+        options = { 'uri' => 'http://localhost/path/__MODULE__' }
+        expect(@context).to receive(:interpolate).with('/path/foo').and_return('/path/foo')
+        expect(@lookuphttp).to receive(:get_parsed).with('/path/foo')
+        function.lookup_key('foo::bar::tango', options, @context)
+      end
+
+      it "should interpolate __CLASS__ correctly" do
+        options = { 'uri' => 'http://localhost/path/__CLASS__' }
+        expect(@context).to receive(:interpolate).with('/path/foo::bar').and_return('/path/foo::bar')
+        expect(@lookuphttp).to receive(:get_parsed).with('/path/foo::bar')
+        function.lookup_key('foo::bar::tango', options, @context)
+      end
+
+      it "should interpolate __PARAMETER__ correctly" do
+        options = { 'uri' => 'http://localhost/path/__PARAMETER__' }
+        expect(@context).to receive(:interpolate).with('/path/tango').and_return('/path/tango')
+        expect(@lookuphttp).to receive(:get_parsed).with('/path/tango')
+        function.lookup_key('foo::bar::tango', options, @context)
+      end
+
+      it "should interpolate more than one field" do
+        options = { 'uri' => 'http://localhost/path/__MODULE__/__PARAMETER__/__PARAMETER__' }
+        expect(@context).to receive(:interpolate).with('/path/foo/tango/tango').and_return('/path/foo/tango/tango')
+        expect(@lookuphttp).to receive(:get_parsed).with('/path/foo/tango/tango')
+        function.lookup_key('foo::bar::tango', options, @context)
+      end
+
+
     end
 
     context "When confine_to_keys is set" do

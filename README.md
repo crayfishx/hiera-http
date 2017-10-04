@@ -59,7 +59,7 @@ The following mandatory Hiera 5 options must be set for each level of the hierar
 
 `name`: A human readable name for the lookup
 `lookup_key`: This option must be set to `hiera_http`
-`uris` or `uri`: An array of URI's passed to `uris` _or_ a single URI passed to `uri`
+`uris` or `uri`: An array of URI's passed to `uris` _or_ a single URI passed to `uri`. This option supports interpolating special tags, see below.
 
 
 The following are optional configuration parameters supported in the `options` hash of the Hiera 5 config
@@ -98,12 +98,16 @@ The following are optional configuration parameters supported in the `options` h
 
 `:headers:`: Hash of headers to send in the request
 
-### Using the key name as part of the URI
+### Interpolating special tags
 
-Previous versions of this backed allowed the use of `%{key}` to include the key
-name as part of the URL. Due to API changes in Hiera v5, this interpolation is
-no longer possible. This backend now supports an alternative method to include
-the key name using the `__KEY__` tag.
+Previous versions of this backed allowed the use of variables such as `%{key}` and `%{calling_module}` to be used in the URL, this has changed with Hiera 5. To allow for similar behaviour you can use a number of tags surrounded by `__` to interpolate special variables derived from the key into the `uri` or `uris` option in hiera.yaml. Currently you can interpolate `__KEY__`, `__MODULE__`, `__CLASS__` and `__PARAMETER__`, these tags are derived from parsing the original lookup key.
+
+In the case of a lookup key matching `foo::bar::tango` the following tags are available;
+
+* `__KEY__` : The original lookup key unchanched; `foo::bar::tango`
+* `__MODULE__` : The first part of the lookup key; `foo`
+* `__CLASS__` : All but the last parts of the lookup key; `foo::bar`
+* `__PARAMETER__` : The last part of they key representing the class parameter; `tango`
 
 Example using this backend to interact with the [Puppet Enterprise Jenkins Pipeline plugin](https://wiki.jenkins.io/display/JENKINS/Puppet+Enterprise+Pipeline+Plugin)
 
@@ -124,10 +128,6 @@ hierarchy:
     options:
       output: json
       failure: graceful
-#      use_auth: true
-#     auth_user: ''
-#     auth_pass: ''
-
 ```
 
 ### Author
