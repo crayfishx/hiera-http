@@ -1,3 +1,7 @@
+## 3.2.0
+
+* Feature: Added the tags `__MODULE__`, `__PARAMETER__` and `__CLASS__` for URL interpolation
+* Bugfix: lookup_http was still being called even when Hiera had a cached value for the lookup path
 
 ## 3.1.0
 
