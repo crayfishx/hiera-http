@@ -37,18 +37,20 @@ Puppet::Functions.create_function(:hiera_http) do
 
   def parse_tags(key,uri)
     key_parts = key.split(/::/)
-    parsed_uri = uri.gsub(/__(\w+)__/i) { |tag|
-        case tag
-        when '__KEY__'
-          key
-        when '__MODULE__'
-          key_parts.first if key_parts.length > 1
-        when '__CLASS__'
-          key_parts[0..-2].join('::') if key_parts.length > 1
-        when '__PARAMETER__'
-          key_parts.last
-        end
-    }
+
+    parsed_uri = uri.gsub(/__(\w+)__/i) do
+      case $1
+      when 'KEY'
+        key
+      when 'MODULE'
+        key_parts.first if key_parts.length > 1
+      when 'CLASS'
+        key_parts[0..-2].join('::') if key_parts.length > 1
+      when 'PARAMETER'
+        key_parts.last
+      end
+    end
+
     return parsed_uri
   end
 
