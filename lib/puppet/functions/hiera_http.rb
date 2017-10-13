@@ -27,10 +27,18 @@ Puppet::Functions.create_function(:hiera_http) do
       end
     end
 
+    json_key = key
+    unless options['json_key'].nil?
+      json_key = options['json_key']
+      if json_key.respond_to?(:gsub)
+        json_key = parse_tags(key, json_key)
+      end
+    end
+
     options['uri'] = parse_tags(key, options['uri'])
     result = http_get(context, options)
 
-    answer = result.is_a?(Hash) ? result[key] : result
+    answer = result.is_a?(Hash) && json_key != false ? result[json_key] : result
     context.not_found if answer.nil?
     return answer
   end

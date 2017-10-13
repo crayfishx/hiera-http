@@ -58,7 +58,9 @@ hierarchy:
 The following mandatory Hiera 5 options must be set for each level of the hierarchy.
 
 `name`: A human readable name for the lookup
+
 `lookup_key`: This option must be set to `hiera_http`
+
 `uris` or `uri`: An array of URI's passed to `uris` _or_ a single URI passed to `uri`. This option supports interpolating special tags, see below.
 
 
@@ -97,6 +99,8 @@ The following are optional configuration parameters supported in the `options` h
 `:auth_pass:`: The password for basic auth
 
 `:headers:`: Hash of headers to send in the request
+
+`:json_key`: The key in the JSON to pass back to hiera. Will be interpolated with the special tags. Set to false to return the whole JSON to hiera.
 
 ### Interpolating special tags
 
