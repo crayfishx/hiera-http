@@ -191,7 +191,7 @@ Can be looked up with;
 
 ```
   options:
-    dig_key: document.settings.__MODULE__.__KEY
+    dig_key: document.settings.__MODULE__.__KEY__
 ```
 
 The `dig` option can be used to disable digging altogether and the entire data hash will be returned with no attempt to resolve a key
