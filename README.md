@@ -128,6 +128,8 @@ hierarchy:
     options:
       output: json
       failure: graceful
+      dig: true
+      dig_key: document.__MODULE__
 ```
 
 ### Author

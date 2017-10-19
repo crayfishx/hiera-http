@@ -30,15 +30,57 @@ Puppet::Functions.create_function(:hiera_http) do
     options['uri'] = parse_tags(key, options['uri'])
     result = http_get(context, options)
 
-    answer = result.is_a?(Hash) ? result[key] : result
-    context.not_found if answer.nil?
-    return answer
+    answer = return_answer(result, key, options)
+    if answer == :not_found
+      context.not_found
+      return nil
+    else
+      return answer
+    end
+
   end
 
-  def parse_tags(key,uri)
+  def return_answer(result, key, options)
+
+    # dig defaults to true, dig_key defaults to the value of the 
+    # lookup key.
+    #
+    dig = options.has_key?('dig') ? options['dig'] : true
+    dig_key = options.has_key?('dig_key') ? options['dig_key'] : key
+
+    # Interpolate values such as __KEY__ into each element of the
+    # dig path, eg: dig_key: document.data.__MODULE__
+    #
+    dig_path = dig_key.split(/\./).map { |p| parse_tags(key, p) }
+
+
+    if result.is_a?(String)
+      return result
+    else
+      return dig ? hash_dig(result, dig_path) : result
+    end
+
+  end
+
+
+  def hash_dig(data, dig_path)
+    key = dig_path.shift
+    if dig_path.empty?
+      if data.has_key?(key)
+        return data[key]
+      else
+        return :not_found
+      end
+    else
+      return :not_found unless data[key].is_a?(Hash)
+      return hash_dig(data[key], dig_path)
+    end
+  end
+
+  def parse_tags(key,str)
     key_parts = key.split(/::/)
 
-    parsed_uri = uri.gsub(/__(\w+)__/i) do
+    parsed_str = str.gsub(/__(\w+)__/i) do
       case $1
       when 'KEY'
         key
@@ -51,7 +93,7 @@ Puppet::Functions.create_function(:hiera_http) do
       end
     end
 
-    return parsed_uri
+    return parsed_str
   end
 
 
