@@ -192,7 +192,7 @@ Can be looked up with;
 
 ```
   options:
-    dig_key: document.settings.__MODULE__.__KEY__
+    dig_key: document.settings.__MODULE__.__PARAMETER__
 ```
 
 In both examples, the returned value to Puppet will be `80`
