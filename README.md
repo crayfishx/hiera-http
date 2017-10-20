@@ -64,39 +64,47 @@ The following mandatory Hiera 5 options must be set for each level of the hierar
 
 The following are optional configuration parameters supported in the `options` hash of the Hiera 5 config
 
-`:output: ` : Specify what handler to use for the output of the request.  Currently supported outputs are plain, which will just return the whole document, or YAML and JSON which parse the data and try to look up the key
+#### Lookup options
 
-`:http_connect_timeout: ` : Timeout in seconds for the HTTP connect (default 10)
+`output: ` : Specify what handler to use for the output of the request.  Currently supported outputs are plain, which will just return the whole document, or YAML and JSON which parse the data and try to look up the key
 
-`:http_read_timeout: ` : Timeout in seconds for waiting for a HTTP response (default 10)
+`http_connect_timeout: ` : Timeout in seconds for the HTTP connect (default 10)
 
-`:confine_to_keys: ` : Only use this backend if the key matches one of the regexes in the array
+`http_read_timeout: ` : Timeout in seconds for waiting for a HTTP response (default 10)
+
+`confine_to_keys: ` : Only use this backend if the key matches one of the regexes in the array
 
       confine_to_keys:
         - "application.*"
         - "apache::.*"
 
-`:failure: ` : When set to `graceful` will stop hiera-http from throwing an exception in the event of a connection error, timeout or invalid HTTP response and move on.  Without this option set hiera-http will throw an exception in such circumstances
+`failure: ` : When set to `graceful` will stop hiera-http from throwing an exception in the event of a connection error, timeout or invalid HTTP response and move on.  Without this option set hiera-http will throw an exception in such circumstances
 
-`:ignore_404: ` : If `failure` is _not_ set to `graceful` then any error code received from the HTTP response will throw an exception.  This option makes 404 responses exempt from exceptions.  This is useful if you expect to get 404's for data items not in a certain part of the hierarchy and need to fall back to the next level in the hierarchy, but you still want to bomb out on other errors.
+`ignore_404: ` : If `failure` is _not_ set to `graceful` then any error code received from the HTTP response will throw an exception.  This option makes 404 responses exempt from exceptions.  This is useful if you expect to get 404's for data items not in a certain part of the hierarchy and need to fall back to the next level in the hierarchy, but you still want to bomb out on other errors.
 
-`:use_ssl:`: When set to true, enable SSL (default: false)
+`dig:` : (true or false)  When the output is parsed YAML or JSON, whether or not to dig into the hash and return the value defined by the `dig_key` option below.  This option defaults to `true`
 
-`:ssl_ca_cert`: Specify a CA cert for use with SSL
+`dig_key` : When the `dig` option is true (default), this option specifies what key is looked up from the results hash returned by the HTTP endpoint.  See [Digging values](#digging-values) below for more information
 
-`:ssl_cert`: Specify location of SSL certificate
+#### HTTP options
 
-`:ssl_key`: Specify location of SSL key
+`use_ssl:`: When set to true, enable SSL (default: false)
 
-`:ssl_verify`: Specify whether to verify SSL certificates (default: true)
+`ssl_ca_cert`: Specify a CA cert for use with SSL
 
-`:use_auth:`: When set to true, enable basic auth (default: false)
+`ssl_cert`: Specify location of SSL certificate
 
-`:auth_user:`: The user for basic auth
+`ssl_key`: Specify location of SSL key
 
-`:auth_pass:`: The password for basic auth
+`ssl_verify`: Specify whether to verify SSL certificates (default: true)
 
-`:headers:`: Hash of headers to send in the request
+`use_auth:`: When set to true, enable basic auth (default: false)
+
+`auth_user:`: The user for basic auth
+
+`auth_pass:`: The password for basic auth
+
+`headers:`: Hash of headers to send in the request
 
 ### Interpolating special tags
 
@@ -129,6 +137,71 @@ hierarchy:
       output: json
       failure: graceful
 ```
+
+### Digging values
+
+Hiera-HTTP supports options to automatically dig into the returned data structure to find a corresponding key.  Puppet lookup itself supports similar dig functionality but being able to specify it at the backend means that where an API wraps the required data up in a different way, we can always lookup the desired value before passing it to Puppet to ensure that class parameter lookups work without having to hard code the `lookup` function and dig down into the data for each request.   The dig functionality in Puppet is intended to enable you to parse your data more effectivly, the dig functionality in hiera-http is intended to make the API of the endpoint you are talking to compatible.
+
+By default, when a hash is returned by the HTTP endpoint (eg: JSON) then hiera-http will attempt to lookup the key corresponding with the lookup key.  For example, when looking up a key `apache::port` we would expect the HTTP endpoint to return something like;
+
+```json
+{
+  "apache::port": 80
+}
+```
+
+Returned value would be `80`
+
+Depending on what HTTP endpoint we are hitting, the returned output may contain other data with the key that we want to look up nested below it. This behaviour can be overriden by using the options `dig` and `dig_key`.
+
+The `dig_key` option can be used to change the key that is looked up, it also supports a dot-notation for digging values in nested hashes. [Special tags](#interpolating-special-tags) can also be used in the `dig_key` option.  Consider the following example output from our HTTP endpoint;
+
+```json
+{
+  "document": {
+    "settings": {
+      "apache::port": 80
+    }
+  }
+}
+```
+
+
+In this scenario we wouldn't be able to use class parameter lookups out-of-the-box, even if we just returned the whole structure, because we always need to drill down into `document.settings` to get the correct value, so In order to map the lookup to find the correct value, we can interpolate the __KEY__ tag into `lookup_key` and tell hiera-http to always dig into the hash with the following option;
+
+```yaml
+  options:
+    dig_key: document.settings.__KEY__
+```
+
+A more complicated example;
+
+```json
+{
+  "document": {
+    "settings": {
+      "apache": {
+        "port": 80
+      }
+    }
+  }
+}
+```
+
+Can be looked up with;
+
+```
+  options:
+    dig_key: document.settings.__MODULE__.__PARAMETER__
+```
+
+In both examples, the returned value to Puppet will be `80`
+
+### Returning the entire data structure
+
+The `dig` option can be used to disable digging altogether and the entire data hash will be returned with no attempt to resolve a key
+
+
 
 ### Author
 

@@ -9,6 +9,7 @@ describe FakeFunction do
     @lookuphttp = instance_double("LookupHttp")
     @context = instance_double("Puppet::LookupContext")
     allow(LookupHttp).to receive(:new).and_return(@lookuphttp)
+    allow(@lookuphttp).to receive(:get_parsed).and_return('value')
     allow(@context).to receive(:cache_has_key)
     allow(@context).to receive(:explain)
     allow(@context).to receive(:interpolate)
@@ -98,6 +99,7 @@ describe FakeFunction do
     context "Output of lookup_http" do
       let(:options) { {
         'uri' => 'http://localhost/path',
+        'output' => 'json'
       } }
       it "should dig if the value is a hash" do
         expect(@lookuphttp).to receive(:get_parsed).with('/path').and_return({ 'tango' => 'delta' })
@@ -111,7 +113,7 @@ describe FakeFunction do
 
     context "cached values" do
       let(:options) { {
-        'uri' => 'http://localhost/path'
+        'uri' => 'http://localhost/path',
       } }
 
       it "should used cached value when available" do
@@ -120,6 +122,71 @@ describe FakeFunction do
         expect(@lookuphttp).not_to receive(:get_parsed)
         expect(function.lookup_key('tango', options, @context)).to eq('bar')
       end
+    end
+
+    context "nil versus undefined" do
+      let(:options) { {
+        'uri' => 'http://localhost/path',
+      } }
+
+      it "should return nil when a value is set to nil" do
+        response = { "config" => nil }
+        expect(@lookuphttp).to receive(:get_parsed).and_return(response)
+        expect(@context).not_to receive(:not_found)
+        expect(function.lookup_key('config', options, @context)).to eq(nil)
+      end
+      it "should return call not_found when the key doesn't exist" do
+        response = { "foo" => "bar"  }
+        expect(@lookuphttp).to receive(:get_parsed).and_return(response)
+        expect(@context).to receive(:not_found)
+        expect(function.lookup_key('config', options, @context)).to eq(nil)
+      end
+    end
+        
+
+      
+
+    context "Digging values" do
+      let(:options) { {
+       'uri' => 'http://localhost/path',
+      } }
+
+      let(:response) { {
+        "document" => {
+          "settings" => {
+            "docroot" => "/www"
+           }
+        }
+      } }
+      before(:each) do
+        expect(@lookuphttp).to receive(:get_parsed).with('/path').and_return(response)
+      end
+
+      it "should default to digging for the lookup key" do
+        expect(function.lookup_key('document', options, @context)).to eq({ "settings" => { "docroot" => "/www" } } )
+      end
+
+      it "should be able to dig for other keys" do
+        extra_opts = { "dig_key" => "document" }
+        expect(function.lookup_key('bar', options.merge(extra_opts), @context)).to eq({ "settings" => { "docroot" => "/www" } } )
+      end
+
+      it "should dig nested values using the dot notation" do
+        extra_opts = { "dig_key" => "document.settings" }
+        expect(function.lookup_key('bar', options.merge(extra_opts), @context)).to eq({ "docroot" => "/www" } )
+      end
+
+      it "should interpolate tags in the key path" do
+        extra_opts = { "dig_key" => "document.__MODULE__.__PARAMETER__" }
+        expect(function.lookup_key('settings::docroot', options.merge(extra_opts), @context)).to eq("/www")
+      end
+
+      it "should return the whole data structure if dig is disabled" do
+        extra_opts = { "dig" => false }
+        expect(function.lookup_key('bar', options.merge(extra_opts), @context)).to eq(response)
+      end
+
+
     end
   end
 end
