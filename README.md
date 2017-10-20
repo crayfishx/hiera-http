@@ -136,11 +136,11 @@ hierarchy:
     options:
       output: json
       failure: graceful
-      dig: true
-      dig_key: document.__MODULE__
 ```
 
 ### Digging values
+
+Hiera-HTTP supports options to automatically dig into the returned data structure to find a corresponding key.  Puppet lookup itself supports similar dig functionality but being able to specify it at the backend means that where an API wraps the required data up in a different way, we can always lookup the desired value before passing it to Puppet to ensure that class parameter lookups work without having to hard code the `lookup` function and dig down into the data for each request.   The dig functionality in Puppet is intended to enable you to parse your data more effectivly, the dig functionality in hiera-http is intended to make the API of the endpoint you are talking to compatible.
 
 By default, when a hash is returned by the HTTP endpoint (eg: JSON) then hiera-http will attempt to lookup the key corresponding with the lookup key.  For example, when looking up a key `apache::port` we would expect the HTTP endpoint to return something like;
 
@@ -152,7 +152,7 @@ By default, when a hash is returned by the HTTP endpoint (eg: JSON) then hiera-h
 
 Returned value would be `80`
 
-This behaviour can be overriden by using the options `dig` and `dig_key`.
+Depending on what HTTP endpoint we are hitting, the returned output may contain other data with the key that we want to look up nested below it. This behaviour can be overriden by using the options `dig` and `dig_key`.
 
 The `dig_key` option can be used to change the key that is looked up, it also supports a dot-notation for digging values in nested hashes. [Special tags](#interpolating-special-tags) can also be used in the `dig_key` option.  Consider the following example output from our HTTP endpoint;
 
@@ -166,7 +166,8 @@ The `dig_key` option can be used to change the key that is looked up, it also su
 }
 ```
 
-In order to map the lookup to find the correct value, we can interpolate the __KEY__ tag into `lookup_key` and tell hiera-http to dig into the hash with the following option;
+
+In this scenario we wouldn't be able to use class parameter lookups out-of-the-box, even if we just returned the whole structure, because we always need to drill down into `document.settings` to get the correct value, so In order to map the lookup to find the correct value, we can interpolate the __KEY__ tag into `lookup_key` and tell hiera-http to always dig into the hash with the following option;
 
 ```yaml
   options:
@@ -193,6 +194,10 @@ Can be looked up with;
   options:
     dig_key: document.settings.__MODULE__.__KEY__
 ```
+
+In both examples, the returned value to Puppet will be `80`
+
+### Returning the entire data structure
 
 The `dig` option can be used to disable digging altogether and the entire data hash will be returned with no attempt to resolve a key
 
