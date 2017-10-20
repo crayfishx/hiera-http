@@ -1,5 +1,5 @@
 
-## 3.3.0
+## 3.3.1  (3.3.0 pulled due to forge package error)
 
 * Feature: New parameters `dig` and `dig_value` give greater control over dealing with APIs that return data in different formats by allowing hiera-http to dig down into the returned data hash to find the corresponding key. Read more about this feature [in the documentation](https://github.com/crayfishx/hiera-http#digging-values)   (https://github.com/crayfishx/hiera-http/pull/66)
 
