@@ -116,6 +116,24 @@ describe FakeFunction do
         'uri' => 'http://localhost/path',
       } }
 
+      it "should use a cached lookuphttp object when available" do
+        expect(@context).to receive(:cache_has_key).with('__lookuphttp').and_return(true)
+        expect(LookupHttp).not_to receive(:new)
+        expect(@context).to receive(:cached_value).with('__lookuphttp').and_return(@lookuphttp)
+        expect(@lookuphttp).to receive(:get_parsed).and_return({ 'tango' => 'bar'})
+        expect(function.lookup_key('tango', options, @context)).to eq('bar')
+      end
+
+
+      it "should create a new lookuphttp object when not cached" do
+        expect(@context).to receive(:cache_has_key).with('__lookuphttp').and_return(false)
+        expect(LookupHttp).to receive(:new).and_return(@lookuphttp)
+        expect(@context).not_to receive(:cached_value).with('__lookuphttp')
+        expect(@lookuphttp).to receive(:get_parsed).and_return({ 'tango' => 'bar'})
+        expect(function.lookup_key('tango', options, @context)).to eq('bar')
+      end
+
+
       it "should used cached value when available" do
         expect(@context).to receive(:cache_has_key).with('/path').and_return(true)
         expect(@context).to receive(:cached_value).with('/path').and_return({ 'tango' => 'bar'})

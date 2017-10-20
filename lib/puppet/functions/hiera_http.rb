@@ -107,11 +107,17 @@ Puppet::Functions.create_function(:hiera_http) do
       return context.cached_value(path)
     else
       context.explain { "Querying #{uri}" }
-      lookup_params = {}
-      options.each do |k,v|
-        lookup_params[k.to_sym] = v if lookup_supported_params.include?(k.to_sym)
+
+      if context.cache_has_key('__lookuphttp')
+        http_handler = context.cached_value('__lookuphttp')
+      else
+        lookup_params = {}
+        options.each do |k,v|
+          lookup_params[k.to_sym] = v if lookup_supported_params.include?(k.to_sym)
+        end
+        http_handler = LookupHttp.new(lookup_params.merge({:host => host, :port => port}))
+        context.cache('__lookuphttp', http_handler)
       end
-      http_handler = LookupHttp.new(lookup_params.merge({:host => host, :port => port}))
 
       begin
         response = http_handler.get_parsed(path)
