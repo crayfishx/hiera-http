@@ -54,10 +54,12 @@ Puppet::Functions.create_function(:hiera_http) do
     dig_path = dig_key.split(/\./).map { |p| parse_tags(key, p) }
 
 
-    if result.is_a?(String)
-      return result
-    else
+    if result.nil?
+      return :not_found
+    elsif result.is_a?(Hash)
       return dig ? hash_dig(result, dig_path) : result
+    else
+      return result
     end
 
   end
