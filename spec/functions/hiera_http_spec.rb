@@ -159,6 +159,12 @@ describe FakeFunction do
         expect(@context).to receive(:not_found)
         expect(function.lookup_key('config', options, @context)).to eq(nil)
       end
+
+      it "should return not_found when a nil value is returned" do
+        expect(@lookuphttp).to receive(:get_parsed).and_return(nil)
+        expect(@context).to receive(:not_found)
+        expect(function.lookup_key('foo', options, @context)).to eq(nil)
+      end
     end
         
 
