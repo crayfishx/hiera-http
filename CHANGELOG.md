@@ -1,3 +1,6 @@
+### 3.3.2
+
+* Bugfix: nil values returned from HTTP lookup caused exception when trying to dig into the hash - this behaviour has been corrected to return `:not_found` in this scenario.  See comment on #66 (https://github.com/crayfishx/hiera-http/pull/69)
 
 ## 3.3.1  (3.3.0 pulled due to forge package error)
 
