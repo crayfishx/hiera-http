@@ -35,7 +35,7 @@ Puppet::Functions.create_function(:hiera_http) do
       context.not_found
       return nil
     else
-      return answer
+      return context.interpolate(answer)
     end
 
   end
