@@ -12,7 +12,9 @@ describe FakeFunction do
     allow(@lookuphttp).to receive(:get_parsed).and_return('value')
     allow(@context).to receive(:cache_has_key)
     allow(@context).to receive(:explain)
-    allow(@context).to receive(:interpolate)
+    allow(@context).to receive(:interpolate) do |val|
+      val
+    end
     allow(@context).to receive(:cache)
     allow(@context).to receive(:not_found)
     allow(@context).to receive(:interpolate).with('/path').and_return('/path')
