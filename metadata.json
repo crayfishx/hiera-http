@@ -1,6 +1,6 @@
 {
   "name": "crayfishx-hiera_http",
-  "version": "3.3.2",
+  "version": "3.4.0",
   "author": "Craig Dunn",
   "summary": "Hiera 5 backend to query data lookups over HTTP",
   "license": "Apache 2.0",

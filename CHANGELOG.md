@@ -1,3 +1,7 @@
+## 3.4.0
+
+* Enhancement: Backend now utilizes Hiera's context.interpolate function to add interpolation of values in results.
+
 ### 3.3.2
 
 * Bugfix: nil values returned from HTTP lookup caused exception when trying to dig into the hash - this behaviour has been corrected to return `:not_found` in this scenario.  See comment on #66 (https://github.com/crayfishx/hiera-http/pull/69)
