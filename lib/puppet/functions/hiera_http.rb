@@ -53,11 +53,12 @@ Puppet::Functions.create_function(:hiera_http) do
     #
     dig_path = dig_key.split(/\./).map { |p| parse_tags(key, p) }
 
+    key_re = options.has_key?('key_re') ? options['key_re'] : ''
 
     if result.nil?
       return :not_found
     elsif result.is_a?(Hash)
-      return dig ? hash_dig(result, dig_path) : result
+      return dig ? hash_dig(result, dig_path, key_re) : result
     else
       return result
     end
@@ -65,17 +66,25 @@ Puppet::Functions.create_function(:hiera_http) do
   end
 
 
-  def hash_dig(data, dig_path)
+  def hash_dig(data, dig_path, key_re)
     key = dig_path.shift
+    reg = Regexp.new key_re
     if dig_path.empty?
       if data.has_key?(key)
         return data[key]
+      elsif data.keys.any? { |k| k.to_s.match(key_re)}
+        data.each { |ka,v|
+          if ka.sub(reg,'').eql? key
+            return v
+          end
+        }
+        return :not_found
       else
         return :not_found
       end
     else
       return :not_found unless data[key].is_a?(Hash)
-      return hash_dig(data[key], dig_path)
+      return hash_dig(data[key], dig_path,key_re)
     end
   end
 
@@ -147,6 +156,9 @@ Puppet::Functions.create_function(:hiera_http) do
       :use_auth,
       :auth_user,
       :auth_pass,
+      :dig,
+      :dig_key,
+      :key_re
     ]
   end
 end
