@@ -102,7 +102,7 @@ Puppet::Functions.create_function(:hiera_http) do
 
   def http_get(context, options)
     uri = URI.parse(options['uri'])
-    host, port, path = uri.host, uri.port, URI.escape(context.interpolate(uri.request_uri))
+    host, port, path = uri.host, uri.port, context.interpolate(uri.request_uri)
 
     if context.cache_has_key(path)
       context.explain { "Returning cached value for #{path}" }
