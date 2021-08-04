@@ -106,6 +106,33 @@ The following are optional configuration parameters supported in the `options` h
 
 `headers:`: Hash of headers to send in the request
 
+#### eyaml support
+
+`eyaml:`: When set to true, enable eyaml support (default: false)
+
+`eyaml_options`: Specify a eyaml options
+
+```yaml
+---
+
+version: 5
+
+hierarchy:
+  - name: "Hiera-HTTP lookup"
+    lookup_key: hiera_http
+    uris:
+      - http://localhost:5984/host/%{trusted.certname}
+      - http://localhost:5984/dc/%{facts.location}
+      - http://localhost:5984/role/%{facts.role}
+    options:
+      output: json
+      ignore_404: true
+      eyaml: true
+      eyaml_options:
+        pkcs7_private_key: /etc/puppetlabs/puppet/keys/private_key.pkcs7.pem
+        pkcs7_public_key: /etc/puppetlabs/puppet/keys/public_key.pkcs7.pem
+```
+
 ### Interpolating special tags
 
 Previous versions of this backed allowed the use of variables such as `%{key}` and `%{calling_module}` to be used in the URL, this has changed with Hiera 5. To allow for similar behaviour you can use a number of tags surrounded by `__` to interpolate special variables derived from the key into the `uri` or `uris` option in hiera.yaml. Currently you can interpolate `__KEY__`, `__MODULE__`, `__CLASS__` and `__PARAMETER__`, these tags are derived from parsing the original lookup key.

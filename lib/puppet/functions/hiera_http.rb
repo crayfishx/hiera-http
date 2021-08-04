@@ -6,6 +6,14 @@ Puppet::Functions.create_function(:hiera_http) do
   rescue LoadError => e
     raise Puppet::DataBinding::LookupError, "Must install lookup_http gem to use hiera-http"
   end
+  begin
+    require 'hiera/backend/eyaml/encryptor'
+    require 'hiera/backend/eyaml/utils'
+    require 'hiera/backend/eyaml/options'
+    require 'hiera/backend/eyaml/parser/parser'
+  rescue LoadError => e
+    raise Puppet::DataBinding::LookupError, "Must install hiera-eyaml gem to use hiera-http"
+  end
   require 'uri'
 
   dispatch :lookup_key do
@@ -35,9 +43,37 @@ Puppet::Functions.create_function(:hiera_http) do
       context.not_found
       return nil
     else
-      return context.interpolate(answer)
+      result = context.interpolate(answer)
+      if options['eyaml']
+        result = decrypt(result, key, options)
+      end
+      return result
     end
 
+  end
+
+  def decrypt(result, key, options)
+    if result.is_a?(Hash)
+      result.each do |k, v|
+        result[k] = decrypt(v, "#{key}/#{k}", options)
+      end
+    elsif result.is_a?(Array)
+      result.each_with_index do |v, i|
+        result[i] = decrypt(v, "#{key}[#{i}]", options)
+      end
+    elsif result.is_a?(String)
+      if /.*ENC\[.*\]/ =~ result
+        Hiera::Backend::Eyaml::Options.set(options['eyaml_options'])
+        begin
+          tokens = Hiera::Backend::Eyaml::Parser::ParserFactory.hiera_backend_parser.parse(result)
+          result = tokens.map(&:to_plain_text).join.chomp
+        rescue StandardError => ex
+          raise Puppet::DataBinding::LookupError,
+            _("hiera-eyaml backend error decrypting %{data} when looking up %{key} in %{path}. Error was %{message}") % { data: result, key: key, path: options['path'], message: ex.message }
+        end
+      end
+    end
+    return result
   end
 
   def return_answer(result, key, options)
@@ -147,6 +183,8 @@ Puppet::Functions.create_function(:hiera_http) do
       :use_auth,
       :auth_user,
       :auth_pass,
+      :eyaml,
+      :eyaml_options
     ]
   end
 end
