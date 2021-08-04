@@ -1,3 +1,7 @@
+## 3.5.0
+
+* Enhancement: Backend now utilizes [hiera-eyaml](https://github.com/voxpupuli/hiera-eyaml) to decrypt data.
+
 ## 3.4.0
 
 * Enhancement: Backend now utilizes Hiera's context.interpolate function to add interpolation of values in results.
